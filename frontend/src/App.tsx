@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import './App.css'
 
 type Milkentry = {
@@ -10,10 +10,26 @@ type Milkentry = {
 }
 
 function App() {
-  const [entries, setEntries] = useState<Milkentry[]>([]);
+  const [entries, setEntries] = useState<Milkentry[]>(() => {
+    const saved = localStorage.getItem("milkentries")
+    return saved ? JSON.parse(saved) : []
+  }
+  );
   const [date, setDate] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
+
+  // useEffect(() => {
+  //   const savedEntries = localStorage.getItem("milkentries")
+
+  //   if(savedEntries){
+  //     setEntries(JSON.parse(savedEntries));
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    localStorage.setItem("milkentries", JSON.stringify(entries));
+  }, [entries]);
 
   const unpaidEntries = entries
   .filter((entry) => !entry.paid)
@@ -70,18 +86,30 @@ function App() {
       </thead>
       <tbody>
         {entries.map((entry, index) => (
-          <tr key={index}>
+          <tr key={index}
+          style={{
+            backgroundColor: entry.paid ? "#065f1aff" : "#8e0914ff"
+          }}>
             <td>{entry.date}</td>
             <td>{entry.quantity}</td>
             <td>{entry.pricePerLitre}</td>
             <td>{entry.total}</td>
             <td>{entry.paid ? "paid" : "unpaid"}</td>
             <td>
-              {!entry.paid && (
-                <button onClick={() => markAsPaid(index)}>
+              
+                <button onClick={() => markAsPaid(index)}
+                disabled = {entry.paid}
+                style={{
+                  backgroundColor: entry.paid ? "#ccc" : "#007bff",
+                  color : entry.paid ? "#666" : "#fff",
+                  cursor : entry.paid ? "not-allowed" : "pointer",
+                  border : "none",
+                  padding : "6px 12px",
+                  borderRadius : "4px"
+                }}>
                 Mark Paid
                 </button>
-              )}
+              
             </td>
           </tr>
         ))}
