@@ -1,4 +1,8 @@
 import { useEffect, useState } from "react";
+import MilkForm from "./components/MilkForm";
+import MilkTable from "./components/MilkTable";
+import Summary from "./components/Summary";
+
 import './App.css'
 
 type Milkentry = {
@@ -9,15 +13,14 @@ type Milkentry = {
   paid: boolean;
 }
 
+const STORAGE_KEY = "milkentries"
+
 function App() {
   const [entries, setEntries] = useState<Milkentry[]>(() => {
     const saved = localStorage.getItem("milkentries")
     return saved ? JSON.parse(saved) : []
-  }
-  );
-  const [date, setDate] = useState("");
-  const [quantity, setQuantity] = useState(0);
-  const [price, setPrice] = useState(0);
+  });
+  
 
   // useEffect(() => {
   //   const savedEntries = localStorage.getItem("milkentries")
@@ -28,96 +31,36 @@ function App() {
   // }, []);
 
   useEffect(() => {
-    localStorage.setItem("milkentries", JSON.stringify(entries));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }, [entries]);
 
   const unpaidEntries = entries
   .filter((entry) => !entry.paid)
   .reduce((sum, entry) => sum + entry.total, 0)
 
-  const markAsPaid = (index: number) => {
-    const updatedEntries = entries.map((entry, i) => 
-    i === index ? {...entry, paid:true} : entry
-    );
-    setEntries(updatedEntries);
+  const addEntry = (entry: Milkentry) => {
+    setEntries([...entries, entry])
   }
+
+  const markAsPaid = (index: number) => {
+    setEntries(
+      entries.map((e,i) => (i === index ? {...e, paid: true } : e))
+    ) 
+  };
+
+  const deleteEntry = (index : number) => {
+    setEntries(entries.filter((_, i) => i !== index));
+  };
 
 
 
 
   return(
     <div style={{padding: "20px"}}>
-    <h1>Milk Transaction Tracker</h1>
-    <form
-    onSubmit={(e) => {
-      e.preventDefault();
-
-      const total = quantity * price;
-
-      const newentry: Milkentry = {
-        date,
-        quantity,
-        pricePerLitre: price,
-        total,
-        paid : false
-      }
-      
-      setEntries([...entries, newentry])
-
-      setDate("");
-      setQuantity(0);
-      setPrice(0);
-    }}>
-      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required/>
-      <input type="number" placeholder="Quantity (litres)" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} required/>
-      <input type="number" placeholder="Price Per Litre" value={price} onChange={(e) => setPrice(Number(e.target.value))} required/>
-      <button type="submit"> Add Entry </button>
-    </form>
-    <table border={1} cellPadding={10} style={{ marginTop: "20px" }}>
-      <thead>
-      <tr>
-        <th>Date</th>
-        <th>Quantity</th>
-        <th>Price Per Litre</th>
-        <th>Total</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-      </thead>
-      <tbody>
-        {entries.map((entry, index) => (
-          <tr key={index}
-          style={{
-            backgroundColor: entry.paid ? "#065f1aff" : "#8e0914ff"
-          }}>
-            <td>{entry.date}</td>
-            <td>{entry.quantity}</td>
-            <td>{entry.pricePerLitre}</td>
-            <td>{entry.total}</td>
-            <td>{entry.paid ? "paid" : "unpaid"}</td>
-            <td>
-              
-                <button onClick={() => markAsPaid(index)}
-                disabled = {entry.paid}
-                style={{
-                  backgroundColor: entry.paid ? "#ccc" : "#007bff",
-                  color : entry.paid ? "#666" : "#fff",
-                  cursor : entry.paid ? "not-allowed" : "pointer",
-                  border : "none",
-                  padding : "6px 12px",
-                  borderRadius : "4px"
-                }}>
-                Mark Paid
-                </button>
-              
-            </td>
-          </tr>
-        ))}
-
-      </tbody>
-    </table>
-    <h3>Total Unpaid Amount: ₹{unpaidEntries}
-    </h3>
+      <h1>Milk Transaction System</h1>
+      <Summary unpaidTotal = {unpaidEntries}></Summary>
+      <MilkForm onAddEntry={addEntry}></MilkForm>
+      <MilkTable entries={entries} onMarkPaid={markAsPaid} onDelete={deleteEntry}></MilkTable>
     </div>
   )
 }
