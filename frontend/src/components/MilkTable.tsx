@@ -1,4 +1,5 @@
 type Milkentry = {
+  id: number,
   date: string;
   quantity: number;
   pricePerLitre: number;
@@ -8,8 +9,8 @@ type Milkentry = {
 
 type Props = {
     entries: Milkentry[];
-    onMarkPaid: (index: number) => void;
-    onDelete: (index: number) => void;
+    onMarkPaid: (id: number) => void;
+    onDelete: (id: number) => void;
 }
 
 function MilkTable({entries, onMarkPaid, onDelete}: Props){
@@ -26,8 +27,8 @@ function MilkTable({entries, onMarkPaid, onDelete}: Props){
       </tr>
       </thead>
       <tbody>
-        {entries.map((entry, index) => (
-          <tr key={index}
+        {entries.map((entry) => (
+          <tr key={entry.id}
           style={{
             backgroundColor: entry.paid ? "#065f1aff" : "#8e0914ff"
           }}>
@@ -37,7 +38,7 @@ function MilkTable({entries, onMarkPaid, onDelete}: Props){
             <td>{entry.total}</td>
             <td>{entry.paid ? "paid" : "unpaid"}</td>
             <td>
-                <button onClick={() => onMarkPaid(index)}
+                <button onClick={() => onMarkPaid(entry.id)}
                 disabled = {entry.paid}
                 style={{
                   backgroundColor: entry.paid ? "#ccc" : "#007bff",
@@ -51,7 +52,7 @@ function MilkTable({entries, onMarkPaid, onDelete}: Props){
                 Mark Paid
                 </button>
                 <button
-    onClick={() => onDelete(index)}
+    onClick={() => onDelete(entry.id)}
     style={{
       backgroundColor: "#dc3545",
       color: "#fff",

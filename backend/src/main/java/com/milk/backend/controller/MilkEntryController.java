@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@CrossOrigin(origins="http://localhost:5173")
 @RestController
 @RequestMapping("/entries")
 public class MilkEntryController {
@@ -27,7 +28,7 @@ public class MilkEntryController {
         return service.getAllEntries();
     }
 
-    @PutMapping("/{id}/paid")
+    @PutMapping("/{id}/pay")
     public MilkEntry markAsPaid(@PathVariable Long id){
         return service.markAsPaid(id);
     }

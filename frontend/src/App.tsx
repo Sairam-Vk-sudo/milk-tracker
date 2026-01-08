@@ -2,24 +2,23 @@ import { useEffect, useState } from "react";
 import MilkForm from "./components/MilkForm";
 import MilkTable from "./components/MilkTable";
 import Summary from "./components/Summary";
-
+import { fetchEntries, addEntry, markPaid, deleteEntry} from "./api/milkApi";
+import type { MilkEntry } from "./api/milkApi";
 import './App.css'
 
-type Milkentry = {
-  date: string;
-  quantity: number;
-  pricePerLitre: number;
-  total: number;
-  paid: boolean;
-}
-
-const STORAGE_KEY = "milkentries"
 
 function App() {
-  const [entries, setEntries] = useState<Milkentry[]>(() => {
-    const saved = localStorage.getItem("milkentries")
-    return saved ? JSON.parse(saved) : []
-  });
+  const [entries, setEntries] = useState<MilkEntry[]>([]);
+
+  useEffect(()=> {
+    fetchEntries().then(setEntries);
+  }, [])
+
+
+  const unpaidTotal = entries
+  .filter((e) => !e.paid)
+  .reduce((sum, e) => sum + e.total, 0);
+
   
 
   // useEffect(() => {
@@ -30,27 +29,26 @@ function App() {
   //   }
   // }, []);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  }, [entries]);
+  const handleAddEntry = async(entry: {
+    date: string,
+    quantity: number,
+    pricePerLitre: number
+  }) => {
+    const saved = await addEntry(entry)
+    setEntries((prev) => [...prev, saved]);
+  };
 
-  const unpaidEntries = entries
-  .filter((entry) => !entry.paid)
-  .reduce((sum, entry) => sum + entry.total, 0)
+  const handleMarkedPaid = async (id:number) => {
+    const updated = await markPaid(id);
+    setEntries((prev) => 
+      prev.map((e) => (e.id === id ? updated : e))
+    );
+  };
 
-  const addEntry = (entry: Milkentry) => {
-    setEntries([...entries, entry])
+  const handleDelete = async (id: number) => {
+    await deleteEntry(id);
+    setEntries((prev) => prev.filter((e) => e.id !== id))
   }
-
-  const markAsPaid = (index: number) => {
-    setEntries(
-      entries.map((e,i) => (i === index ? {...e, paid: true } : e))
-    ) 
-  };
-
-  const deleteEntry = (index : number) => {
-    setEntries(entries.filter((_, i) => i !== index));
-  };
 
 
 
@@ -58,9 +56,9 @@ function App() {
   return(
     <div style={{padding: "20px"}}>
       <h1>Milk Transaction System</h1>
-      <Summary unpaidTotal = {unpaidEntries}></Summary>
-      <MilkForm onAddEntry={addEntry}></MilkForm>
-      <MilkTable entries={entries} onMarkPaid={markAsPaid} onDelete={deleteEntry}></MilkTable>
+      <Summary unpaidTotal = {unpaidTotal}></Summary>
+      <MilkForm onAddEntry={handleAddEntry}></MilkForm>
+      <MilkTable entries={entries} onMarkPaid={handleMarkedPaid} onDelete={handleDelete}></MilkTable>
     </div>
   )
 }
