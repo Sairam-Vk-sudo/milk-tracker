@@ -1,4 +1,5 @@
 import { useState } from "react";
+import './MilkForm.css'
 
 type Milkentry = {
   date: string;
@@ -35,7 +36,7 @@ function MilkForm({onAddEntry}: Props){
         setQuantity(0);
     };
     return (
-    <form onSubmit={handleSubmit}>
+    <form className='milk-form' onSubmit={handleSubmit}>
         <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required/>
         <input type="number" placeholder="Quantity (litres)" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} required/>
         <input type="number" placeholder="Price Per Litre" value={price} onChange={(e) => setPrice(Number(e.target.value))} required/>

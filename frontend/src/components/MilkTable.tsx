@@ -1,4 +1,7 @@
+import './MilkTable.css';
+
 type Milkentry = {
+  id: number,
   date: string;
   quantity: number;
   pricePerLitre: number;
@@ -8,13 +11,13 @@ type Milkentry = {
 
 type Props = {
     entries: Milkentry[];
-    onMarkPaid: (index: number) => void;
-    onDelete: (index: number) => void;
+    onMarkPaid: (id: number) => void;
+    onDelete: (id: number) => void;
 }
 
 function MilkTable({entries, onMarkPaid, onDelete}: Props){
     return(
-      <table border={1} cellPadding={10} style={{ marginTop: "20px" }}>
+      <table className='milk-table'>
       <thead>
       <tr>
         <th>Date</th>
@@ -26,40 +29,24 @@ function MilkTable({entries, onMarkPaid, onDelete}: Props){
       </tr>
       </thead>
       <tbody>
-        {entries.map((entry, index) => (
-          <tr key={index}
-          style={{
-            backgroundColor: entry.paid ? "#065f1aff" : "#8e0914ff"
-          }}>
+        {entries.map((entry) => (
+          <tr className={entry.paid ? 'row-paid' : 'row-unpaid'}
+          >
             <td>{entry.date}</td>
             <td>{entry.quantity}</td>
             <td>{entry.pricePerLitre}</td>
             <td>{entry.total}</td>
             <td>{entry.paid ? "paid" : "unpaid"}</td>
             <td>
-                <button onClick={() => onMarkPaid(index)}
+                <button onClick={() => onMarkPaid(entry.id)}
                 disabled = {entry.paid}
-                style={{
-                  backgroundColor: entry.paid ? "#ccc" : "#007bff",
-                  color : entry.paid ? "#666" : "#fff",
-                  cursor : entry.paid ? "not-allowed" : "pointer",
-                  border : "none",
-                  padding : "6px 12px",
-                  borderRadius : "4px",
-                  marginRight: "8px"
-                }}>
+                className={`action-btn ${entry.paid ? 'btn-disabled' : 'btn-paid'}`}
+                >
                 Mark Paid
                 </button>
                 <button
-    onClick={() => onDelete(index)}
-    style={{
-      backgroundColor: "#dc3545",
-      color: "#fff",
-      cursor: "pointer",
-      border: "none",
-      padding: "6px 12px",
-      borderRadius: "4px",
-    }}
+    onClick={() => onDelete(entry.id)}
+    className='action-btn delete-btn'
   >
     Delete
   </button>
