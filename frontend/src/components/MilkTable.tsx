@@ -1,3 +1,5 @@
+import './MilkTable.css';
+
 type Milkentry = {
   id: number,
   date: string;
@@ -15,7 +17,7 @@ type Props = {
 
 function MilkTable({entries, onMarkPaid, onDelete}: Props){
     return(
-      <table border={1} cellPadding={10} style={{ marginTop: "20px" }}>
+      <table className='milk-table'>
       <thead>
       <tr>
         <th>Date</th>
@@ -28,10 +30,8 @@ function MilkTable({entries, onMarkPaid, onDelete}: Props){
       </thead>
       <tbody>
         {entries.map((entry) => (
-          <tr key={entry.id}
-          style={{
-            backgroundColor: entry.paid ? "#065f1aff" : "#8e0914ff"
-          }}>
+          <tr className={entry.paid ? 'row-paid' : 'row-unpaid'}
+          >
             <td>{entry.date}</td>
             <td>{entry.quantity}</td>
             <td>{entry.pricePerLitre}</td>
@@ -40,27 +40,13 @@ function MilkTable({entries, onMarkPaid, onDelete}: Props){
             <td>
                 <button onClick={() => onMarkPaid(entry.id)}
                 disabled = {entry.paid}
-                style={{
-                  backgroundColor: entry.paid ? "#ccc" : "#007bff",
-                  color : entry.paid ? "#666" : "#fff",
-                  cursor : entry.paid ? "not-allowed" : "pointer",
-                  border : "none",
-                  padding : "6px 12px",
-                  borderRadius : "4px",
-                  marginRight: "8px"
-                }}>
+                className={`action-btn ${entry.paid ? 'btn-disabled' : 'btn-paid'}`}
+                >
                 Mark Paid
                 </button>
                 <button
     onClick={() => onDelete(entry.id)}
-    style={{
-      backgroundColor: "#dc3545",
-      color: "#fff",
-      cursor: "pointer",
-      border: "none",
-      padding: "6px 12px",
-      borderRadius: "4px",
-    }}
+    className='action-btn delete-btn'
   >
     Delete
   </button>

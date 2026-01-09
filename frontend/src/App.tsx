@@ -54,11 +54,17 @@ function App() {
 
 
   return(
-    <div style={{padding: "20px"}}>
+    <div className="app-container">
       <h1>Milk Transaction System</h1>
-      <Summary unpaidTotal = {unpaidTotal}></Summary>
-      <MilkForm onAddEntry={handleAddEntry}></MilkForm>
-      <MilkTable entries={entries} onMarkPaid={handleMarkedPaid} onDelete={handleDelete}></MilkTable>
+      <div className="section">
+        <Summary unpaidTotal = {unpaidTotal}></Summary>
+      </div>
+      <div className="section">
+        <MilkForm onAddEntry={handleAddEntry}></MilkForm>
+      </div>
+      <div className="section">
+        <MilkTable entries={entries} onMarkPaid={handleMarkedPaid} onDelete={handleDelete}></MilkTable>
+      </div>
     </div>
   )
 }
